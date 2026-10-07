@@ -22,8 +22,9 @@ Referencia: [`PlayerExplains/l2-launcher-custom` en el commit `9dd1add9`](https:
 - GitHub CLI (`gh`) autenticado para publicar un parche.
 - Un cliente base que se instala en `Client\` tras la confirmación del usuario.
 
-El launcher consulta el Release más reciente y busca `client-manifest.json`
-junto con los ZIP de parches. Comprueba cada archivo con SHA-256 y conserva los
+El launcher consulta el Release más reciente y busca `client-manifest.json`,
+`client-manifest.json.sig` y los ZIP de parches. Comprueba cada archivo con
+SHA-256 y conserva los
 bytes publicados, incluidos los archivos cifrados. Para iniciar el juego usa
 `system\l2.exe` con `system` como directorio de trabajo, de forma que el cliente
 lea su `L2.ini`.

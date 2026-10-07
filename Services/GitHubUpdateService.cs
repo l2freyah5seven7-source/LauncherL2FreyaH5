@@ -75,7 +75,7 @@ public sealed class GitHubUpdateService
         var manifestAsset = release.Assets.SingleOrDefault(asset =>
             string.Equals(asset.Name, "client-manifest.json", StringComparison.Ordinal));
         var signatureAsset = release.Assets.SingleOrDefault(asset =>
-            string.Equals(asset.Name, "client-manifest.sig", StringComparison.Ordinal));
+            string.Equals(asset.Name, "client-manifest.json.sig", StringComparison.Ordinal));
         if (manifestAsset is null || signatureAsset is null)
         {
             throw new InvalidDataException(
