@@ -9,7 +9,9 @@ param(
 
     [Parameter(Mandatory = $true)]
     [ValidatePattern('^\d+\.\d+\.\d+\.\d+$')]
-    [string]$Version
+    [string]$Version,
+
+    [switch]$ReplaceExisting
 )
 
 $ErrorActionPreference = 'Stop'
@@ -191,9 +193,21 @@ try {
     foreach ($assetName in $assetNames) {
         $uploadFiles += (Resolve-Path -LiteralPath (Join-Path $staging $assetName)).Path
     }
-    $notes = "Parche $Version. Solo contiene archivos permitidos en patch-files.txt."
-    $arguments = @('release', 'create', $tag) + $uploadFiles +
-        @('--repo', $Repository, '--target', $TargetBranch, '--title', $tag, '--notes', $notes)
+    if ($ReplaceExisting) {
+        & $gh.Source release view $tag --repo $Repository *> $null
+        if ($LASTEXITCODE -ne 0) {
+            throw "No existe el Release $tag para reemplazar."
+        }
+
+        $arguments = @('release', 'upload', $tag) + $uploadFiles +
+            @('--repo', $Repository, '--clobber')
+    }
+    else {
+        $notes = "Parche $Version. Solo contiene archivos permitidos en patch-files.txt."
+        $arguments = @('release', 'create', $tag) + $uploadFiles +
+            @('--repo', $Repository, '--target', $TargetBranch, '--title', $tag, '--notes', $notes)
+    }
+
     Write-Host "Se publicarán $($currentFiles.Count) archivo(s) autorizado(s) ($($changed.Count) con cambios) en $Repository."
     & $gh.Source @arguments
     if ($LASTEXITCODE -ne 0) {
