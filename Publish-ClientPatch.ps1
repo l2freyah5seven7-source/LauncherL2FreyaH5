@@ -90,7 +90,7 @@ foreach ($relativePath in $allowlist) {
             $rootPrefix, [System.StringComparison]::OrdinalIgnoreCase)) {
         throw "La ruta sale de la carpeta del cliente: $relativePath"
     }
-    if ($relativePath -match '^(?i:(?:Replay|Screenshot|LauncherSource|L2Launcher)/)' -or
+    if ($relativePath -match '^(?i:(?:\.git|Replay|Screenshot|LauncherSource|L2Launcher)/)' -or
         $relativePath -match '^(?i:LineageII\.exe|LineageII\.cfg|system\.zip|\.l2launcher-version)$' -or
         $relativePath -match '^(?i:system/[^/]+\.log)$') {
         throw "La ruta está excluida de la publicación: $relativePath"
@@ -112,7 +112,7 @@ foreach ($relativePath in $deletedPaths) {
     if ([System.IO.Path]::IsPathRooted($relativePath) -or
         $relativePath.Contains(':') -or $relativePath.Contains([char]0) -or
         $relativePath -match '(^|/)\.\.?(/|$)' -or
-        $relativePath -match '^(?i:(?:Replay|Screenshot|LauncherSource|L2Launcher)/)' -or
+        $relativePath -match '^(?i:(?:\.git|Replay|Screenshot|LauncherSource|L2Launcher)/)' -or
         $relativePath -match '^(?i:LineageII\.exe|LineageII\.cfg|system\.zip|\.l2launcher-version)$' -or
         $relativePath -match '^(?i:system/[^/]+\.log)$') {
         throw "La ruta eliminada no es segura o está excluida: $relativePath"
