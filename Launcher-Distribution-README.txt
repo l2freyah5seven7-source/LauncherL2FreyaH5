@@ -16,9 +16,9 @@ reintentar una instalacion incompleta.
 El arte permanece estatico con particulas animadas de polvo y brasas. El icono
 dorado de Ascension esta incorporado en LineageII.exe.
 
-El actualizador de parches de GitHub esta preparado, pero necesita el
-repositorio publico. Configura GitHubOwner y GitHubRepository en
-launcher.settings.json. Solo subas los archivos listados en patch-files.txt,
-nunca el cliente completo.
+El actualizador consulta los parches firmados de
+l2freyah5seven7-source/ParcheL2Freya. No edites launcher.settings.json; el
+launcher rechazara cambios sin una firma valida. La clave privada no se
+distribuye; nunca se publica el cliente base completo.
 
 Esta basado en PlayerExplains/l2-launcher-custom; licencia MIT en LICENSE.

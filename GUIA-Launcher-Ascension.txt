@@ -25,10 +25,10 @@ revisala antes de retirar esa carpeta y volver a intentar.
 
 PARCHES DE GITHUB
 -----------------
-El actualizador esta preparado, pero no se conecta hasta configurar un
-repositorio publico. Cuando este creado, indica su owner y su nombre en
-launcher.settings.json. Publica unicamente los archivos de patch-files.txt;
-el cliente base no se sube a GitHub.
+El actualizador consulta los parches firmados de
+l2freyah5seven7-source/ParcheL2Freya. No edites launcher.settings.json: el
+launcher rechazara cambios sin una firma valida. La clave privada no se
+incluye en este paquete.
 
 EFECTOS, ICONO Y LICENCIA
 -------------------------

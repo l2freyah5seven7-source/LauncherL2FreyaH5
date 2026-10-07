@@ -17,9 +17,9 @@ El arte de Ascension permanece estatico. Particulas de polvo y brasas se
 mueven suavemente sobre el fondo, sin tapar los controles. El icono de
 Ascension esta incorporado en `LineageII.exe`.
 
-El actualizador de parches de GitHub esta incluido y espera a que exista tu
-repositorio publico. Configura `GitHubOwner` y `GitHubRepository` en
-`launcher.settings.json`. Solo se publican los archivos incluidos
-expresamente en `patch-files.txt`; el cliente base completo nunca se sube.
+El actualizador consulta los parches firmados de
+`l2freyah5seven7-source/ParcheL2Freya`. No edites `launcher.settings.json`:
+el launcher rechazara cambios sin una firma valida. El cliente base completo
+nunca se publica en GitHub.
 
 Basado en [`PlayerExplains/l2-launcher-custom`](https://github.com/PlayerExplains/l2-launcher-custom/tree/9dd1add9e569cd12dd802984b17c1677a950902f), con licencia MIT incluida en `LICENSE`.
