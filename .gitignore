@@ -1,0 +1,14 @@
+**/bin/
+**/obj/
+dist/
+publish-*/
+.vs/
+*.user
+*.suo
+*.pdb
+publisher-state.json
+staging/
+**/launcher-signing-key.dpapi
+**/*private*.pem
+**/*private*.key
+**/*.pfx

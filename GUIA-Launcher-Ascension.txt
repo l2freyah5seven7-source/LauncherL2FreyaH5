@@ -1,0 +1,38 @@
+ASCENSION - LINEAGE II HIGH FIVE
+================================
+
+PARA PROBAR EN OTRO PC
+---------------------
+Copia la carpeta L2Launcher completa al otro PC. Esta carpeta incluye el
+launcher, el icono, el video y la configuracion. El juego se descarga por
+separado.
+
+Ejecuta Iniciar L2.bat o LineageII.exe. Al abrirlo por primera vez NO empieza
+ninguna descarga. El boton muestra ACTUALIZAR: al pulsarlo aparece una
+confirmacion para descargar el cliente oficial High Five (unos 6 GB) e
+instalarlo en la subcarpeta Client.
+
+Al terminar la instalacion, el boton cambia a JUGAR. El juego se ejecuta
+desde Client\system\l2.exe, con Client\system como directorio de trabajo. El
+launcher no modifica ningun otro cliente que ya tengas en el PC.
+
+SI SE INTERRUMPE
+----------------
+Si cancelas la confirmacion, no se descarga ningun archivo. Si cierras el
+launcher mientras descarga, abre Iniciar L2.bat de nuevo para reintentar.
+No se sobrescribe una carpeta Client que ya tenga archivos incompletos;
+revisala antes de retirar esa carpeta y volver a intentar.
+
+PARCHES DE GITHUB
+-----------------
+El actualizador esta preparado, pero no se conecta hasta configurar un
+repositorio publico. Cuando este creado, indica su owner y su nombre en
+launcher.settings.json. Publica unicamente los archivos de patch-files.txt;
+el cliente base no se sube a GitHub.
+
+EFECTOS, ICONO Y LICENCIA
+-------------------------
+El emblema de Ascension ya esta incorporado en LineageII.exe. El arte permanece
+estatico con particulas animadas de polvo y brasas.
+El codigo del launcher se basa en PlayerExplains/l2-launcher-custom (MIT);
+incluye su licencia en LICENSE.

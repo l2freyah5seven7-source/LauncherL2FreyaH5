@@ -1,0 +1,200 @@
+<Window x:Class="L2Launcher.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Ascension — Lineage II Freya"
+        Width="1152" Height="800"
+        MinWidth="1152" MinHeight="800"
+        MaxWidth="1152" MaxHeight="800"
+        WindowStyle="None" ResizeMode="NoResize"
+        WindowStartupLocation="CenterScreen"
+        Background="#090B12"
+        Loaded="Window_Loaded"
+        Closing="Window_Closing">
+    <Border Background="#040404" BorderBrush="#161616"
+            BorderThickness="1" CornerRadius="8">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="28" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+
+            <Grid Grid.Row="0" Background="#0B0B0B"
+                  MouseLeftButtonDown="TitleBar_MouseLeftButtonDown">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <TextBlock Margin="10,0,0,0"
+                           Text="ASCENSION • LINEAGE II"
+                           VerticalAlignment="Center"
+                           Foreground="#C8C8C8" FontSize="12" />
+                <StackPanel Grid.Column="1" Orientation="Horizontal"
+                            Margin="0,0,6,0">
+                    <Button Width="34" Height="22" Margin="0,3,4,3"
+                            Content="—" Click="MinimizeButton_Click"
+                            Background="#151515" Foreground="#EAEAEA"
+                            BorderBrush="#2E2E2E" />
+                    <Button Width="34" Height="22" Margin="0,3,0,3"
+                            Content="X" Click="CloseButton_Click"
+                            Background="#351717" Foreground="#EAEAEA"
+                            BorderBrush="#5C2A2A" />
+                </StackPanel>
+            </Grid>
+
+            <Grid Grid.Row="1" ClipToBounds="True" Background="#090B12">
+                <Image Source="Resources/ascension-art.png"
+                       Stretch="UniformToFill" Opacity="0.38">
+                    <Image.Effect>
+                        <BlurEffect Radius="18" />
+                    </Image.Effect>
+                </Image>
+                <Image x:Name="Artwork"
+                       Source="Resources/ascension-art.png"
+                       Stretch="Uniform" />
+                <Canvas x:Name="ParticleCanvas"
+                        ClipToBounds="True"
+                        IsHitTestVisible="False" />
+                <Viewbox Stretch="Uniform">
+                    <Canvas Width="1376" Height="768" ClipToBounds="True">
+            <Rectangle Width="1376" Height="768" IsHitTestVisible="False">
+                <Rectangle.Fill>
+                    <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                        <GradientStop Color="#55050912" Offset="0" />
+                        <GradientStop Color="#00050912" Offset="0.36" />
+                        <GradientStop Color="#00050912" Offset="0.68" />
+                        <GradientStop Color="#D9090B12" Offset="1" />
+                    </LinearGradientBrush>
+                </Rectangle.Fill>
+            </Rectangle>
+
+            <Border Canvas.Left="50" Canvas.Top="54"
+                    Width="375" Padding="15,14"
+                    Background="#B80B101A"
+                    BorderBrush="#665D6C7D" BorderThickness="1"
+                    CornerRadius="3">
+                <StackPanel Orientation="Horizontal">
+                    <Image Source="Resources/ascension-icon.png"
+                           Width="66" Height="66"
+                           Margin="0,0,14,0"
+                           Stretch="Uniform" />
+                    <StackPanel VerticalAlignment="Center">
+                        <TextBlock Text="ASCENSION REALM"
+                                   FontSize="14" FontWeight="Bold"
+                                   Foreground="{StaticResource GoldBrush}" />
+                        <TextBlock Margin="0,7,0,0" Text="FREYA • HIGH FIVE"
+                                   FontSize="20" FontWeight="SemiBold"
+                                   Foreground="White" />
+                        <StackPanel Margin="0,9,0,0" Orientation="Horizontal">
+                            <Ellipse Width="8" Height="8" Fill="#83C98F"
+                                     VerticalAlignment="Center" />
+                            <TextBlock x:Name="ServerStatus"
+                                       Margin="9,0,0,0" Text="CLIENTE LISTO"
+                                       FontSize="12" FontWeight="SemiBold"
+                                       Foreground="#D9E2E2" />
+                        </StackPanel>
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+
+            <Border Canvas.Left="851" Canvas.Top="54"
+                    Width="475" Padding="17,14"
+                    Background="#C8090B12"
+                    BorderBrush="#556D7886" BorderThickness="1"
+                    CornerRadius="3">
+                <StackPanel>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="ESTADO DEL CLIENTE"
+                                   FontSize="12" FontWeight="Bold"
+                                   Foreground="{StaticResource GoldBrush}" />
+                        <TextBlock x:Name="ProgressPercent"
+                                   Grid.Column="1" Text="0%"
+                                   FontSize="12" Foreground="#D9DDE4" />
+                    </Grid>
+                    <ProgressBar x:Name="UpdateProgressBar"
+                                 Margin="0,12,0,0" Height="5"
+                                 Minimum="0" Maximum="100" Value="0"
+                                 Foreground="{StaticResource GoldBrush}"
+                                 Background="#46505B" BorderThickness="0" />
+                    <TextBlock x:Name="StatusText" Margin="0,9,0,0"
+                               Text="Listo para comprobar actualizaciones"
+                               FontSize="13" Foreground="#E5E7EB"
+                               TextTrimming="CharacterEllipsis" />
+                    <Button x:Name="CheckButton" Margin="0,12,0,0"
+                            Width="265" Height="34"
+                            HorizontalAlignment="Left"
+                            Content="ACTUALIZAR PARCHES"
+                            Click="CheckButton_Click"
+                            Background="#242D37" Foreground="White"
+                            BorderBrush="#697584" BorderThickness="1"
+                            FontSize="11" FontWeight="Bold"
+                            Cursor="Hand" />
+                </StackPanel>
+            </Border>
+
+            <Button x:Name="PlayButton"
+                    Canvas.Right="58" Canvas.Bottom="52"
+                    Width="180" Height="180"
+                    Click="PlayButton_Click"
+                    Background="Transparent" Foreground="#F3E3CF"
+                    BorderBrush="Transparent" BorderThickness="0"
+                    FontSize="22" FontWeight="SemiBold"
+                    Content="ACTUALIZAR"
+                    Cursor="Hand">
+                <Button.Template>
+                    <ControlTemplate TargetType="Button">
+                        <Grid Width="180" Height="180">
+                            <Ellipse Fill="#01000000" />
+                            <Ellipse x:Name="HoverGlow" Margin="10"
+                                     Fill="#30140E08" Stroke="#99D6A65A"
+                                     StrokeThickness="1.5" />
+                            <Ellipse Margin="18" Fill="#1A0C0905"
+                                     Stroke="#45FFE0A0" StrokeThickness="1" />
+                            <TextBlock Text="{TemplateBinding Content}"
+                                       Foreground="{TemplateBinding Foreground}"
+                                       FontSize="{TemplateBinding FontSize}"
+                                       FontWeight="{TemplateBinding FontWeight}"
+                                       FontFamily="Georgia"
+                                       HorizontalAlignment="Center"
+                                       VerticalAlignment="Center">
+                                <TextBlock.Effect>
+                                    <DropShadowEffect BlurRadius="10"
+                                                      ShadowDepth="0"
+                                                      Color="#66000000"
+                                                      Opacity="0.8" />
+                                </TextBlock.Effect>
+                            </TextBlock>
+                        </Grid>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="HoverGlow" Property="Fill"
+                                        Value="#18F3A24E" />
+                                <Setter TargetName="HoverGlow" Property="Stroke"
+                                        Value="#88FFD09A" />
+                                <Setter Property="Foreground" Value="#FFF1E1" />
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter Property="Foreground" Value="#8F8478" />
+                                <Setter TargetName="HoverGlow" Property="Fill"
+                                        Value="#00000000" />
+                                <Setter TargetName="HoverGlow" Property="Stroke"
+                                        Value="#00000000" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Button.Template>
+            </Button>
+
+            <TextBlock Canvas.Left="50" Canvas.Bottom="17"
+                       Text="ASCENSION • LINEAGE II"
+                       FontSize="10"
+                       Foreground="#AEB4BE" />
+                    </Canvas>
+                </Viewbox>
+            </Grid>
+        </Grid>
+    </Border>
+</Window>

@@ -1,0 +1,9 @@
+<Application x:Class="L2Launcher.App"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             Startup="App_Startup">
+    <Application.Resources>
+        <SolidColorBrush x:Key="GoldBrush" Color="#E7BE72" />
+        <SolidColorBrush x:Key="MutedBrush" Color="#D5D5D5" />
+    </Application.Resources>
+</Application>
