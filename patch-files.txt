@@ -1,6 +1,4 @@
-# List authorized patch files relative to the Client\ folder, one per line.
-# Examples:
-# system/L2.ini
-# system/ServerName-e.dat
-#
-# Only listed files will be published. Never include the complete base client.
+# Archivos autorizados para publicar, relativos a la raiz del cliente.
+system/L2.ini
+system/ItemName-e.dat
+system/Weapongrp.dat

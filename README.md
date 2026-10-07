@@ -40,11 +40,12 @@ conserva `LineageII.exe`, el arte estatico y la configuración.
 
 ## Configurar GitHub
 
-Cuando tengas el repositorio **público de parches**, actualiza
-`GitHubOwner`/`GitHubRepository` en `launcher.settings.json` y vuelve a firmar
-la configuración antes de compilar y publicar una nueva version del launcher.
-El actualizador aplicará los Releases verificados mediante SHA-256 a `Client\`.
-El launcher no incluye ni almacena tokens.
+El launcher consulta el repositorio público
+`l2freyah5seven7-source/ParcheL2Freya`. Para publicar cambios, edita la lista
+permitida en `patch-files.txt` y ejecuta el publicador con una versión de cuatro
+componentes, por ejemplo `1.0.0.2`. La configuración firmada del launcher
+apunta al último Release de ese repositorio. El launcher no incluye ni
+almacena tokens.
 La configuración y el manifiesto de cada Release también requieren una
 firma ECDSA P-256/SHA-256. La clave privada se protege con DPAPI para el
 usuario Windows en `%LOCALAPPDATA%\AscensionLauncher` y no se incluye en el
@@ -64,7 +65,7 @@ Escribe en `patch-files.txt` las rutas exactas que quieras publicar. Revisa el
 contenido antes de ejecutar:
 
 ```powershell
-.\Publish-ClientPatch.ps1 -Repository "usuario/repositorio" -ClientRoot "C:\ruta\al\cliente"
+.\Publish-ClientPatch.ps1 -Repository "l2freyah5seven7-source/ParcheL2Freya" -ClientRoot "C:\ruta\al\cliente" -Version "1.0.0.1"
 ```
 
 El publicador crea un Release con el manifiesto y los ZIP de los archivos

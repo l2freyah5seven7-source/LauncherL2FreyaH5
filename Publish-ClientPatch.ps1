@@ -5,7 +5,11 @@ param(
     [Parameter(Mandatory = $true)]
     [string]$ClientRoot,
 
-    [string]$TargetBranch = 'main'
+    [string]$TargetBranch = 'main',
+
+    [Parameter(Mandatory = $true)]
+    [ValidatePattern('^\d+\.\d+\.\d+\.\d+$')]
+    [string]$Version
 )
 
 $ErrorActionPreference = 'Stop'
@@ -98,7 +102,7 @@ if ($changed.Count -eq 0) {
     exit 0
 }
 
-$tag = 'client-' + (Get-Date -Format 'yyyyMMdd-HHmmss')
+$tag = "v$Version"
 $staging = Join-Path $projectDirectory ('staging\' + $tag)
 $maxPartBytes = 700MB
 $groups = New-Object 'System.Collections.Generic.List[object]'
@@ -164,7 +168,7 @@ try {
     }
     $manifest = [PSCustomObject]@{
         schemaVersion = 1
-        version = $tag
+        version = $Version
         assets = $assetNames
         files = $manifestFiles
     }
@@ -187,7 +191,7 @@ try {
     foreach ($assetName in $assetNames) {
         $uploadFiles += (Resolve-Path -LiteralPath (Join-Path $staging $assetName)).Path
     }
-    $notes = 'Parche incremental. Solo contiene archivos permitidos en patch-files.txt.'
+    $notes = "Parche $Version. Solo contiene archivos permitidos en patch-files.txt."
     $arguments = @('release', 'create', $tag) + $uploadFiles +
         @('--repo', $Repository, '--target', $TargetBranch, '--title', $tag, '--notes', $notes)
     Write-Host "Se publicarán $($currentFiles.Count) archivo(s) autorizado(s) ($($changed.Count) con cambios) en $Repository."
