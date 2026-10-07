@@ -27,6 +27,7 @@ public partial class MainWindow : Window
     public MainWindow()
     {
         InitializeComponent();
+        HideDistributionFiles();
         _signatureService = new LauncherSignatureService();
         var settings = LoadSettings(_signatureService);
         _clientRoot = GetSafeClientRoot(settings.ClientDirectory);
@@ -40,6 +41,27 @@ public partial class MainWindow : Window
             _launcherRoot,
             _clientRoot);
 
+    }
+
+    private static void HideDistributionFiles()
+    {
+        string[] fileNames =
+        [
+            "Iniciar L2.bat",
+            "launcher.settings.json",
+            "launcher.settings.json.sig",
+            "Publish-ClientPatch.ps1",
+            "Sign-LauncherAssets.ps1"
+        ];
+
+        foreach (var fileName in fileNames)
+        {
+            var path = Path.Combine(AppContext.BaseDirectory, fileName);
+            if (File.Exists(path))
+            {
+                File.SetAttributes(path, File.GetAttributes(path) | FileAttributes.Hidden);
+            }
+        }
     }
 
     private static LauncherSettings LoadSettings(LauncherSignatureService signatureService)

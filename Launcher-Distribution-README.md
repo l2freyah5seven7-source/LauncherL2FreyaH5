@@ -2,6 +2,9 @@
 
 Copia la carpeta completa `L2Launcher` al otro PC. La carpeta incluye el
 launcher, el icono y el arte estatico; **el cliente base se descarga aparte**.
+Al abrir el launcher, se ocultan los archivos auxiliares: el BAT, la
+configuracion firmada y las herramientas de mantenimiento. Esto es solo una
+preferencia visual; no impide que alguien los encuentre o los modifique.
 
 Ejecuta `Iniciar L2.bat` o `LineageII.exe`. Abrir la ventana **no** inicia la
 descarga. Al principio, el boton dice **ACTUALIZAR**. Pulsa el boton y confirma
