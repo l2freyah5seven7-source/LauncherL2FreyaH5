@@ -125,6 +125,9 @@ function Get-ClientSnapshot {
     while ($directories.Count -gt 0) {
         $directory = $directories.Pop()
         foreach ($item in Get-ChildItem -LiteralPath $directory -Force) {
+            if (($item.Attributes -band [System.IO.FileAttributes]::ReparsePoint) -ne 0) {
+                continue
+            }
             $relative = $item.FullName.Substring($Root.Length).TrimStart('\', '/').Replace('\', '/')
             if ($item.PSIsContainer) {
                 if (-not (Test-ExcludedPath -RelativePath ($relative + '/'))) {
