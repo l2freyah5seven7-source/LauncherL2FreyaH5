@@ -75,11 +75,23 @@ contenido antes de ejecutar:
 .\Publish-ClientPatch.ps1 -Repository "l2freyah5seven7-source/ParcheL2Freya" -ClientRoot "C:\ruta\al\cliente" -Version "1.0.0.1"
 ```
 
+Para publicar desde una interfaz, abre `Open-ClientPatchPublisher.bat`.
+La primera ejecución registra el estado actual como base local y no sube los
+archivos originales del cliente. En los análisis siguientes muestra archivos
+nuevos, modificados y eliminados; los cambios se publican en un nuevo Release y
+las eliminaciones requieren confirmación explícita. Se necesita GitHub CLI
+(`gh`) autenticado como propietario del repositorio y la clave privada DPAPI
+del publicador en la misma cuenta de Windows.
+El publicador no habilita eliminaciones hasta que exista el Release público
+del launcher v1.0.4, porque las versiones anteriores no entienden el manifiesto
+firmado con eliminaciones.
+
 El publicador crea un Release con el manifiesto y los ZIP de los archivos
-permitidos actuales. Así, un jugador puede actualizar desde cualquier versión
-directamente al último Release. Nunca sube el cliente completo y rechaza rutas
-como el launcher, el respaldo del cliente, logs y capturas. No elimina archivos
-locales cuando un archivo deja de aparecer en un parche.
+administrados actuales. Así, un jugador puede actualizar desde cualquier
+versión directamente al último Release. Nunca sube el cliente completo y
+rechaza rutas como el launcher, el respaldo del cliente, logs y capturas. No
+elimina archivos por omisión: solo quita archivos señalados expresamente en
+`deletedFiles`, generados por la interfaz tras la confirmación del publicador.
 
 ## Compilar
 

@@ -106,7 +106,7 @@ public sealed class GitHubUpdateService
             }
         }
 
-        if (pendingFiles.Count == 0)
+        if (pendingFiles.Count == 0 && manifest.DeletedFiles.Count == 0)
         {
             progress.Report(new UpdateProgress
             {
@@ -170,6 +170,16 @@ public sealed class GitHubUpdateService
                 {
                     File.Delete(packagePath);
                 }
+            }
+        }
+
+        foreach (var relativePath in manifest.DeletedFiles)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            var targetPath = GetSafeTargetPath(relativePath);
+            if (File.Exists(targetPath))
+            {
+                File.Delete(targetPath);
             }
         }
 
@@ -306,16 +316,19 @@ public sealed class GitHubUpdateService
             Convert.FromHexString(expectedHash));
     }
 
-    private static void ValidateManifest(ClientManifest manifest)
+    private void ValidateManifest(ClientManifest manifest)
     {
-        if (manifest.SchemaVersion != 1)
+        if (manifest.SchemaVersion is not (1 or 2))
         {
             throw new InvalidDataException(
                 $"Versión de manifiesto no compatible: {manifest.SchemaVersion}.");
         }
 
         if (manifest.Assets is null || manifest.Files is null ||
-            manifest.Assets.Count == 0 || manifest.Files.Count == 0)
+            manifest.DeletedFiles is null ||
+            (manifest.Assets.Count == 0 && manifest.Files.Count > 0) ||
+            (manifest.Files.Count == 0 &&
+             (manifest.SchemaVersion < 2 || manifest.DeletedFiles.Count == 0)))
         {
             throw new InvalidDataException("El manifiesto no contiene paquetes ni archivos.");
         }
@@ -340,11 +353,26 @@ public sealed class GitHubUpdateService
                 string.IsNullOrWhiteSpace(file.Sha256) ||
                 file.AssetIndex < 0 || file.AssetIndex >= manifest.Assets.Count ||
                 !Regex.IsMatch(file.Sha256, "^[0-9a-fA-F]{64}$") ||
-                !seenPaths.Add(file.Path))
+                !seenPaths.Add(file.Path.Replace('\\', '/')))
             {
                 throw new InvalidDataException(
                     $"La entrada del manifiesto no es válida: {file.Path ?? "(sin ruta)"}");
             }
+        }
+
+        var deletedPaths = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        foreach (var deletedPath in manifest.DeletedFiles)
+        {
+            if (manifest.SchemaVersion < 2 ||
+                string.IsNullOrWhiteSpace(deletedPath) ||
+                !deletedPaths.Add(deletedPath.Replace('\\', '/')) ||
+                seenPaths.Contains(deletedPath.Replace('\\', '/')))
+            {
+                throw new InvalidDataException(
+                    $"La ruta eliminada del manifiesto no es válida: {deletedPath ?? "(sin ruta)"}");
+            }
+
+            _ = GetSafeTargetPath(deletedPath);
         }
     }
 
@@ -404,6 +432,9 @@ public sealed class ClientManifest
 
     [JsonPropertyName("files")]
     public List<ManifestFile> Files { get; init; } = [];
+
+    [JsonPropertyName("deletedFiles")]
+    public List<string> DeletedFiles { get; init; } = [];
 }
 
 public sealed class ManifestFile

@@ -11,7 +11,9 @@ param(
     [ValidatePattern('^\d+\.\d+\.\d+\.\d+$')]
     [string]$Version,
 
-    [switch]$ReplaceExisting
+    [switch]$ReplaceExisting,
+
+    [string]$SelectionFile
 )
 
 $ErrorActionPreference = 'Stop'
@@ -32,11 +34,31 @@ if (-not (Test-Path -LiteralPath $allowlistPath -PathType Leaf)) {
     throw "No existe la lista permitida: $allowlistPath"
 }
 
-$allowlist = @(Get-Content -LiteralPath $allowlistPath -Encoding UTF8 |
-    ForEach-Object { $_.Trim().Replace('\', '/') } |
-    Where-Object { $_ -and -not $_.StartsWith('#') } |
-    Select-Object -Unique)
-if ($allowlist.Count -eq 0) {
+$deletedPaths = @()
+if ($SelectionFile) {
+    if (-not (Test-Path -LiteralPath $SelectionFile -PathType Leaf)) {
+        throw "No existe la selección de archivos: $SelectionFile"
+    }
+    $selection = Get-Content -LiteralPath $SelectionFile -Raw -Encoding UTF8 | ConvertFrom-Json
+    if ($null -eq $selection.files -or $null -eq $selection.deletedFiles) {
+        throw 'La selección debe contener las listas files y deletedFiles.'
+    }
+    $allowlist = @($selection.files |
+        ForEach-Object { ([string]$_).Trim().Replace('\', '/') } |
+        Where-Object { $_ } |
+        Select-Object -Unique)
+    $deletedPaths = @($selection.deletedFiles |
+        ForEach-Object { ([string]$_).Trim().Replace('\', '/') } |
+        Where-Object { $_ } |
+        Select-Object -Unique)
+}
+else {
+    $allowlist = @(Get-Content -LiteralPath $allowlistPath -Encoding UTF8 |
+        ForEach-Object { $_.Trim().Replace('\', '/') } |
+        Where-Object { $_ -and -not $_.StartsWith('#') } |
+        Select-Object -Unique)
+}
+if ($allowlist.Count -eq 0 -and $deletedPaths.Count -eq 0) {
     throw 'patch-files.txt está vacío; añade rutas exactas antes de publicar.'
 }
 
@@ -68,7 +90,7 @@ foreach ($relativePath in $allowlist) {
             $rootPrefix, [System.StringComparison]::OrdinalIgnoreCase)) {
         throw "La ruta sale de la carpeta del cliente: $relativePath"
     }
-    if ($relativePath -match '^(?i:(?:Replay|Screenshot|LauncherSource|L2Launcher|app|runtime)/)' -or
+    if ($relativePath -match '^(?i:(?:Replay|Screenshot|LauncherSource|L2Launcher)/)' -or
         $relativePath -match '^(?i:LineageII\.exe|LineageII\.cfg|system\.zip|\.l2launcher-version)$' -or
         $relativePath -match '^(?i:system/[^/]+\.log)$') {
         throw "La ruta está excluida de la publicación: $relativePath"
@@ -76,10 +98,50 @@ foreach ($relativePath in $allowlist) {
     if (Test-Path -LiteralPath $fullPath -PathType Leaf) {
         $currentFiles[$relativePath] = (Get-FileHash -LiteralPath $fullPath -Algorithm SHA256).Hash.ToLowerInvariant()
     }
+    elseif ($SelectionFile) {
+        throw "El archivo seleccionado ya no existe: $relativePath"
+    }
 }
-if ($currentFiles.Count -eq 0) {
+if ($currentFiles.Count -eq 0 -and $deletedPaths.Count -eq 0) {
     throw 'Ningún archivo permitido existe en la carpeta del cliente.'
 }
+
+$validatedDeletedPaths = New-Object 'System.Collections.Generic.List[string]'
+$seenDeletedPaths = New-Object 'System.Collections.Generic.HashSet[string]' ([System.StringComparer]::OrdinalIgnoreCase)
+foreach ($relativePath in $deletedPaths) {
+    if ([System.IO.Path]::IsPathRooted($relativePath) -or
+        $relativePath.Contains(':') -or $relativePath.Contains([char]0) -or
+        $relativePath -match '(^|/)\.\.?(/|$)' -or
+        $relativePath -match '^(?i:(?:Replay|Screenshot|LauncherSource|L2Launcher)/)' -or
+        $relativePath -match '^(?i:LineageII\.exe|LineageII\.cfg|system\.zip|\.l2launcher-version)$' -or
+        $relativePath -match '^(?i:system/[^/]+\.log)$') {
+        throw "La ruta eliminada no es segura o está excluida: $relativePath"
+    }
+    if (-not $seenDeletedPaths.Add($relativePath)) {
+        throw "La ruta eliminada está repetida: $relativePath"
+    }
+    if ($currentFiles.ContainsKey($relativePath)) {
+        throw "La ruta no puede publicarse como archivo y como eliminada: $relativePath"
+    }
+
+    $fullPath = [System.IO.Path]::GetFullPath(
+        [System.IO.Path]::Combine(
+            $ClientRoot,
+            $relativePath.Replace('/', [System.IO.Path]::DirectorySeparatorChar)))
+    if (-not $fullPath.StartsWith(
+            $ClientRoot.TrimEnd(
+                [System.IO.Path]::DirectorySeparatorChar,
+                [System.IO.Path]::AltDirectorySeparatorChar) +
+                [System.IO.Path]::DirectorySeparatorChar,
+            [System.StringComparison]::OrdinalIgnoreCase)) {
+        throw "La ruta eliminada sale de la carpeta del cliente: $relativePath"
+    }
+    if (Test-Path -LiteralPath $fullPath) {
+        throw "La ruta marcada para eliminar todavía existe: $relativePath"
+    }
+    $validatedDeletedPaths.Add($relativePath)
+}
+$deletedPaths = @($validatedDeletedPaths)
 
 $previousFiles = @{}
 if (Test-Path -LiteralPath $statePath -PathType Leaf) {
@@ -99,7 +161,7 @@ $changed = @(
         }
     }
 )
-if ($changed.Count -eq 0) {
+if ($changed.Count -eq 0 -and $deletedPaths.Count -eq 0) {
     Write-Host 'No hay cambios en los archivos enumerados en patch-files.txt.'
     exit 0
 }
@@ -169,10 +231,11 @@ try {
         }
     }
     $manifest = [PSCustomObject]@{
-        schemaVersion = 1
+        schemaVersion = if ($deletedPaths.Count -gt 0) { 2 } else { 1 }
         version = $Version
         assets = $assetNames
         files = $manifestFiles
+        deletedFiles = $deletedPaths
     }
     $manifestPath = Join-Path $staging 'client-manifest.json'
     $manifestJson = $manifest | ConvertTo-Json -Depth 8
@@ -203,7 +266,7 @@ try {
             @('--repo', $Repository, '--clobber')
     }
     else {
-        $notes = "Parche $Version. Solo contiene archivos permitidos en patch-files.txt."
+        $notes = "Parche $Version. Publicado mediante el administrador de parches firmado."
         $arguments = @('release', 'create', $tag) + $uploadFiles +
             @('--repo', $Repository, '--target', $TargetBranch, '--title', $tag, '--notes', $notes)
     }
