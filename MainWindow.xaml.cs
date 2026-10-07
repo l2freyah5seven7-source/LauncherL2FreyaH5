@@ -396,9 +396,29 @@ public partial class MainWindow : Window
             await _clientInstallService.InstallAsync(
                 progress,
                 _windowCancellation.Token);
-            UpdateProgressBar.Value = 100;
-            ProgressPercent.Text = "100%";
-            StatusText.Text = "Cliente instalado. Pulsa JUGAR para iniciar.";
+            if (_updateService.IsConfigured)
+            {
+                StatusText.Text = "Cliente base instalado. Buscando y aplicando el parche del servidor…";
+                var patchProgress = new Progress<UpdateProgress>(value =>
+                {
+                    StatusText.Text = value.Message;
+                    UpdateProgressBar.Value = value.Percent;
+                    ProgressPercent.Text = $"{value.Percent:0}%";
+                });
+
+                await _updateService.ApplyLatestReleaseAsync(
+                    patchProgress,
+                    _windowCancellation.Token);
+                UpdateProgressBar.Value = 100;
+                ProgressPercent.Text = "100%";
+                StatusText.Text = "Cliente instalado y parche del servidor aplicado. Pulsa JUGAR para iniciar.";
+            }
+            else
+            {
+                UpdateProgressBar.Value = 100;
+                ProgressPercent.Text = "100%";
+                StatusText.Text = "Cliente instalado. Pulsa JUGAR para iniciar.";
+            }
         }
         catch (OperationCanceledException) when (_windowCancellation.IsCancellationRequested)
         {
@@ -406,11 +426,15 @@ public partial class MainWindow : Window
         }
         catch (Exception exception)
         {
-            StatusText.Text = $"No se pudo instalar el cliente: {exception.Message}";
+            StatusText.Text = _clientInstallService.IsInstalled
+                ? $"Cliente instalado, pero no se pudo aplicar el parche: {exception.Message}"
+                : $"No se pudo instalar el cliente: {exception.Message}";
             MessageBox.Show(
                 this,
                 exception.Message,
-                "Instalación del cliente",
+                _clientInstallService.IsInstalled
+                    ? "No se pudo aplicar el parche"
+                    : "Instalación del cliente",
                 MessageBoxButton.OK,
                 MessageBoxImage.Error);
         }

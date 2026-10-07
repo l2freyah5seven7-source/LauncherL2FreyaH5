@@ -38,6 +38,12 @@ una carpeta temporal y lo instala en `Client\` solo cuando encuentra
 sobrescribe una carpeta de cliente ya existente con archivos. La carpeta raíz
 conserva `LineageII.exe`, el arte estatico y la configuración.
 
+Cuando termina la instalación del cliente base, el launcher busca el último
+Release firmado de `l2freyah5seven7-source/ParcheL2Freya` y aplica los archivos
+que faltan o difieren según sus hashes SHA-256. El botón `JUGAR` queda listo
+después del parche. Si el parche falla, el cliente base permanece instalado y
+se puede reintentar con `ACTUALIZAR PARCHES` o al pulsar `JUGAR`.
+
 ## Configurar GitHub
 
 El launcher consulta el repositorio público
